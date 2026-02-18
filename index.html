@@ -1,0 +1,2818 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EduBoard Interactive – Interaktiv Dars Doskasi</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;900&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --surface2: #1a2235;
+    --surface3: #1f2d45;
+    --accent: #f59e0b;
+    --accent2: #3b82f6;
+    --accent3: #10b981;
+    --accent4: #ef4444;
+    --accent5: #8b5cf6;
+    --text: #f1f5f9;
+    --text2: #94a3b8;
+    --text3: #64748b;
+    --border: rgba(255,255,255,0.08);
+    --glow: 0 0 40px rgba(245,158,11,0.15);
+    --radius: 20px;
+    --radius-lg: 28px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    font-size: 18px;
+  }
+
+  /* Background grid pattern */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(59,130,246,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(59,130,246,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    top: -200px; right: -200px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(245,158,11,0.08) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ─── LANG BAR ─── */
+  .lang-bar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 12px 48px;
+    background: rgba(10,14,26,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .lang-group {
+    display: flex;
+    gap: 8px;
+  }
+
+  .lang-btn {
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    padding: 8px 20px;
+    border-radius: 50px;
+    border: 1.5px solid var(--border);
+    background: transparent;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+  }
+  .lang-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .lang-btn.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #000;
+  }
+
+  /* ─── PAGES ─── */
+  .page { 
+    display: none; 
+    min-height: 100vh;
+    padding-top: 72px;
+    position: relative;
+    z-index: 1;
+  }
+  .page.active { display: flex; flex-direction: column; }
+
+  /* ─── LANDING PAGE ─── */
+  #page-home {
+    justify-content: center;
+    align-items: center;
+    padding: 72px 48px 48px;
+  }
+
+  .home-inner {
+    width: 100%;
+    max-width: 1400px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+
+  .home-left {}
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(245,158,11,0.1);
+    border: 1px solid rgba(245,158,11,0.3);
+    border-radius: 50px;
+    padding: 8px 20px;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 32px;
+    letter-spacing: 0.5px;
+  }
+  .badge-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.3); }
+  }
+
+  .home-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: clamp(2.2rem, 4vw, 3.8rem);
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 24px;
+  }
+  .home-title span {
+    background: linear-gradient(135deg, var(--accent), #f97316);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .home-desc {
+    font-size: 1.15rem;
+    color: var(--text2);
+    line-height: 1.7;
+    margin-bottom: 48px;
+    max-width: 500px;
+  }
+
+  .home-stats {
+    display: flex;
+    gap: 32px;
+    margin-bottom: 48px;
+  }
+  .stat-item {}
+  .stat-num {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .stat-label {
+    font-size: 0.85rem;
+    color: var(--text3);
+    margin-top: 4px;
+  }
+
+  .btn-start {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    padding: 22px 52px;
+    border-radius: 100px;
+    border: none;
+    background: linear-gradient(135deg, var(--accent), #f97316);
+    color: #000;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 8px 32px rgba(245,158,11,0.35);
+    letter-spacing: 0.5px;
+  }
+  .btn-start:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 48px rgba(245,158,11,0.5);
+  }
+
+  .home-right {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .feature-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 24px;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .feature-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--accent-bg, rgba(245,158,11,0.05)), transparent);
+    pointer-events: none;
+  }
+  .feature-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--accent);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+  }
+  .feature-card.blue { --accent-bg: rgba(59,130,246,0.05); }
+  .feature-card.green { --accent-bg: rgba(16,185,129,0.05); }
+  .feature-card.purple { --accent-bg: rgba(139,92,246,0.05); }
+  .feature-card.span2 { grid-column: span 2; }
+
+  .feature-icon {
+    font-size: 2.5rem;
+    margin-bottom: 16px;
+    display: block;
+  }
+  .feature-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .feature-desc {
+    font-size: 0.88rem;
+    color: var(--text2);
+    line-height: 1.5;
+  }
+
+  /* ─── SETUP PAGE ─── */
+  #page-setup {
+    justify-content: center;
+    align-items: center;
+    padding: 72px 48px 48px;
+  }
+
+  .setup-container {
+    width: 100%;
+    max-width: 1000px;
+  }
+
+  .page-header {
+    text-align: center;
+    margin-bottom: 56px;
+  }
+  .page-header h2 {
+    font-family: 'Unbounded', sans-serif;
+    font-size: clamp(1.6rem, 3vw, 2.6rem);
+    font-weight: 900;
+    margin-bottom: 12px;
+  }
+  .page-header h2 span {
+    background: linear-gradient(135deg, var(--accent), #f97316);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .page-header p {
+    color: var(--text2);
+    font-size: 1.05rem;
+  }
+
+  /* Step indicators */
+  .steps-bar {
+    display: flex;
+    justify-content: center;
+    gap: 0;
+    margin-bottom: 56px;
+  }
+  .step-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .step-num {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: var(--surface2);
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Unbounded', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text3);
+    transition: all 0.3s;
+    flex-shrink: 0;
+  }
+  .step-item.done .step-num { background: var(--accent3); border-color: var(--accent3); color: #000; }
+  .step-item.active .step-num { background: var(--accent); border-color: var(--accent); color: #000; }
+  .step-label {
+    font-size: 0.88rem;
+    color: var(--text3);
+    font-weight: 600;
+  }
+  .step-item.active .step-label { color: var(--accent); }
+  .step-item.done .step-label { color: var(--accent3); }
+  .step-line {
+    width: 60px;
+    height: 2px;
+    background: var(--border);
+    margin: 0 4px;
+  }
+  .step-item.done + .step-line { background: var(--accent3); }
+
+  /* Setup Grid */
+  .setup-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 40px;
+  }
+  .setup-grid.single { grid-template-columns: 1fr; }
+  .setup-grid.three { grid-template-columns: 1fr 1fr 1fr; }
+
+  .form-group {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px;
+    transition: all 0.2s;
+  }
+  .form-group:hover { border-color: rgba(245,158,11,0.3); }
+  .form-group:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(245,158,11,0.1); }
+
+  .form-label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+  }
+
+  .select-styled {
+    width: 100%;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%2394a3b8' viewBox='0 0 24 24'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    background-size: 24px;
+    transition: all 0.2s;
+  }
+  .select-styled:focus { outline: none; border-color: var(--accent); }
+
+  /* Fan cards */
+  .fan-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  .fan-card {
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 12px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+  .fan-card:hover { border-color: var(--accent); }
+  .fan-card.selected {
+    background: rgba(245,158,11,0.1);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  .fan-card-icon { font-size: 1.8rem; display: block; margin-bottom: 8px; }
+
+  /* Sinf selector */
+  .sinf-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 10px;
+  }
+  .sinf-btn {
+    aspect-ratio: 1;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    font-family: 'Unbounded', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text2);
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .sinf-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+  .sinf-btn.selected {
+    background: var(--accent2);
+    border-color: var(--accent2);
+    color: #fff;
+    box-shadow: 0 4px 20px rgba(59,130,246,0.4);
+  }
+
+  /* Mashq type checkboxes */
+  .mashq-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  .mashq-card {
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .mashq-card:hover { border-color: rgba(245,158,11,0.4); }
+  .mashq-card.selected {
+    background: rgba(245,158,11,0.08);
+    border-color: var(--accent);
+  }
+  .mashq-check {
+    width: 24px; height: 24px;
+    border-radius: 6px;
+    border: 2px solid var(--border);
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+  .mashq-card.selected .mashq-check {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .mashq-check svg { display: none; }
+  .mashq-card.selected .mashq-check svg { display: block; }
+  .mashq-info {}
+  .mashq-name {
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-bottom: 2px;
+  }
+  .mashq-desc {
+    font-size: 0.78rem;
+    color: var(--text3);
+  }
+  .mashq-icon { font-size: 1.2rem; }
+
+  /* Number input */
+  .num-input-group {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .num-btn {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    background: var(--surface2);
+    color: var(--text);
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    font-weight: 700;
+  }
+  .num-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .num-display {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: var(--accent);
+    min-width: 80px;
+    text-align: center;
+  }
+  .num-label {
+    font-size: 0.9rem;
+    color: var(--text3);
+  }
+
+  /* Generate button */
+  .btn-generate {
+    width: 100%;
+    font-family: 'Unbounded', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    padding: 24px;
+    border-radius: var(--radius);
+    border: none;
+    background: linear-gradient(135deg, var(--accent), #f97316);
+    color: #000;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 8px 32px rgba(245,158,11,0.35);
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+  .btn-generate:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 48px rgba(245,158,11,0.5);
+  }
+  .btn-generate:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* ─── RESULTS PAGE ─── */
+  #page-results {
+    padding: 72px 48px 48px;
+    align-items: center;
+  }
+
+  .results-container {
+    width: 100%;
+    max-width: 1200px;
+  }
+
+  .results-header {
+    margin-bottom: 48px;
+  }
+  .results-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 900;
+    margin-bottom: 8px;
+  }
+  .results-sub { color: var(--text2); font-size: 1rem; }
+
+  .results-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 24px;
+    margin-bottom: 40px;
+  }
+
+  .result-card {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px 28px;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .result-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--card-accent, var(--accent));
+  }
+  .result-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--card-accent, var(--accent));
+  }
+
+  .result-card-icon { font-size: 2.5rem; margin-bottom: 16px; display: block; }
+  .result-card-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .result-card-count {
+    font-size: 0.9rem;
+    color: var(--text2);
+    margin-bottom: 24px;
+  }
+
+  .btn-start-exercise {
+    width: 100%;
+    font-family: 'Unbounded', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    padding: 14px 20px;
+    border-radius: 12px;
+    border: 2px solid var(--card-accent, var(--accent));
+    background: rgba(245,158,11,0.08);
+    color: var(--card-accent, var(--accent));
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.3px;
+  }
+  .btn-start-exercise:hover {
+    background: var(--card-accent, var(--accent));
+    color: #000;
+  }
+
+  /* ─── EXERCISE PAGE ─── */
+  #page-exercise {
+    padding: 72px 0 0;
+    min-height: 100vh;
+  }
+
+  .exercise-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    height: calc(100vh - 72px);
+    overflow: hidden;
+  }
+
+  .exercise-sidebar {
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 32px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    overflow-y: auto;
+  }
+
+  .sidebar-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .sidebar-info {}
+  .sidebar-subject {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+  .sidebar-topic {
+    font-size: 0.88rem;
+    color: var(--text2);
+  }
+
+  /* Progress */
+  .progress-section {}
+  .progress-bar-wrap {
+    height: 8px;
+    background: var(--surface2);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), #f97316);
+    border-radius: 4px;
+    transition: width 0.5s ease;
+  }
+  .progress-text {
+    font-size: 0.85rem;
+    color: var(--text2);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  /* Score */
+  .score-section {
+    background: var(--surface2);
+    border-radius: 14px;
+    padding: 20px;
+    text-align: center;
+  }
+  .score-label { font-size: 0.8rem; color: var(--text3); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+  .score-num {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: var(--accent3);
+    line-height: 1;
+  }
+  .score-total { font-size: 0.85rem; color: var(--text3); margin-top: 4px; }
+
+  /* Timer */
+  .timer-section {}
+  .timer-display {
+    background: var(--surface2);
+    border-radius: 14px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .timer-icon { font-size: 1.5rem; }
+  .timer-countdown {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--text);
+    transition: color 0.3s;
+  }
+  .timer-countdown.warning { color: var(--accent4); }
+  .timer-controls {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+  }
+  .timer-btn {
+    flex: 1;
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text2);
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 700;
+    transition: all 0.2s;
+  }
+  .timer-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .timer-btn.active { background: var(--accent); border-color: var(--accent); color: #000; }
+
+  /* Q-list mini */
+  .q-list-mini {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .q-dot {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--text3);
+  }
+  .q-dot.current { border-color: var(--accent); color: var(--accent); }
+  .q-dot.correct { background: var(--accent3); border-color: var(--accent3); color: #fff; }
+  .q-dot.wrong { background: var(--accent4); border-color: var(--accent4); color: #fff; }
+
+  /* Exercise main */
+  .exercise-main {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .exercise-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 48px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .ex-type-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(245,158,11,0.1);
+    border: 1px solid rgba(245,158,11,0.3);
+    border-radius: 50px;
+    padding: 8px 20px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .ex-nav-btns {
+    display: flex;
+    gap: 12px;
+  }
+  .nav-btn {
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    padding: 12px 28px;
+    border-radius: 12px;
+    border: 1.5px solid var(--border);
+    background: transparent;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .nav-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .nav-btn.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #000;
+  }
+
+  .exercise-content {
+    flex: 1;
+    padding: 48px;
+    overflow-y: auto;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+  }
+
+  .exercise-card {
+    width: 100%;
+    max-width: 860px;
+    animation: slideIn 0.4s ease;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .q-number {
+    font-size: 0.85rem;
+    color: var(--text3);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+  }
+
+  .q-text {
+    font-family: 'Unbounded', sans-serif;
+    font-size: clamp(1.4rem, 2.5vw, 2.2rem);
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: 48px;
+    color: var(--text);
+  }
+
+  .options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .option-btn {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px 28px;
+    cursor: pointer;
+    transition: all 0.25s;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    text-align: left;
+  }
+  .option-btn:hover {
+    border-color: var(--accent2);
+    background: rgba(59,130,246,0.05);
+    transform: translateY(-2px);
+  }
+  .option-btn.selected {
+    border-color: var(--accent2);
+    background: rgba(59,130,246,0.1);
+  }
+  .option-btn.correct {
+    border-color: var(--accent3);
+    background: rgba(16,185,129,0.1);
+  }
+  .option-btn.wrong {
+    border-color: var(--accent4);
+    background: rgba(239,68,68,0.1);
+  }
+
+  .option-letter {
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    background: var(--surface2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Unbounded', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    transition: all 0.25s;
+  }
+  .option-btn:hover .option-letter { background: var(--accent2); color: #fff; }
+  .option-btn.correct .option-letter { background: var(--accent3); color: #fff; }
+  .option-btn.wrong .option-letter { background: var(--accent4); color: #fff; }
+
+  .option-text {
+    font-size: 1.05rem;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  /* True/False */
+  .tf-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  .tf-btn {
+    padding: 48px;
+    border-radius: var(--radius-lg);
+    border: 3px solid var(--border);
+    background: var(--surface);
+    cursor: pointer;
+    transition: all 0.25s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  .tf-btn:hover { transform: translateY(-4px); }
+  .tf-btn.true-btn:hover { border-color: var(--accent3); background: rgba(16,185,129,0.05); }
+  .tf-btn.false-btn:hover { border-color: var(--accent4); background: rgba(239,68,68,0.05); }
+  .tf-btn.correct { border-color: var(--accent3); background: rgba(16,185,129,0.1); }
+  .tf-btn.wrong { border-color: var(--accent4); background: rgba(239,68,68,0.1); }
+  .tf-icon { font-size: 4rem; }
+  .tf-text {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 900;
+  }
+
+  /* Fill blank */
+  .fill-blank-input {
+    width: 100%;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px 28px;
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 600;
+    transition: all 0.2s;
+    margin-bottom: 20px;
+  }
+  .fill-blank-input:focus {
+    outline: none;
+    border-color: var(--accent2);
+    box-shadow: 0 0 0 4px rgba(59,130,246,0.1);
+  }
+  .fill-blank-input.correct { border-color: var(--accent3); background: rgba(16,185,129,0.05); }
+  .fill-blank-input.wrong { border-color: var(--accent4); background: rgba(239,68,68,0.05); }
+
+  .btn-check {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    padding: 18px 40px;
+    border-radius: 14px;
+    border: none;
+    background: var(--accent2);
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 20px rgba(59,130,246,0.3);
+  }
+  .btn-check:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(59,130,246,0.4); }
+
+  /* Feedback banner */
+  .feedback-banner {
+    display: none;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 28px;
+    border-radius: 14px;
+    margin-top: 24px;
+    animation: slideIn 0.3s ease;
+  }
+  .feedback-banner.correct {
+    display: flex;
+    background: rgba(16,185,129,0.1);
+    border: 1.5px solid var(--accent3);
+    color: var(--accent3);
+  }
+  .feedback-banner.wrong {
+    display: flex;
+    background: rgba(239,68,68,0.1);
+    border: 1.5px solid var(--accent4);
+    color: var(--accent4);
+  }
+  .feedback-icon { font-size: 1.8rem; }
+  .feedback-text { font-size: 1rem; font-weight: 700; }
+  .feedback-answer { font-size: 0.9rem; opacity: 0.8; margin-top: 2px; }
+
+  /* Word Search */
+  .word-search-grid {
+    display: inline-grid;
+    gap: 4px;
+    background: var(--surface2);
+    padding: 20px;
+    border-radius: 16px;
+    margin-bottom: 24px;
+  }
+  .ws-cell {
+    width: 44px; height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Unbounded', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    user-select: none;
+  }
+  .ws-cell:hover { border-color: var(--accent2); }
+  .ws-cell.selected { background: var(--accent2); border-color: var(--accent2); color: #fff; }
+  .ws-cell.found { background: var(--accent3); border-color: var(--accent3); color: #fff; }
+
+  .words-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 16px;
+  }
+  .word-chip {
+    padding: 8px 18px;
+    border-radius: 50px;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--text2);
+    transition: all 0.2s;
+  }
+  .word-chip.found {
+    background: rgba(16,185,129,0.1);
+    border-color: var(--accent3);
+    color: var(--accent3);
+    text-decoration: line-through;
+  }
+
+  /* Riddle */
+  .riddle-card {
+    background: var(--surface2);
+    border-radius: var(--radius-lg);
+    padding: 48px;
+    text-align: center;
+    position: relative;
+  }
+  .riddle-deco {
+    font-size: 4rem;
+    margin-bottom: 24px;
+    display: block;
+  }
+  .riddle-text {
+    font-family: 'Unbounded', sans-serif;
+    font-size: clamp(1.2rem, 2vw, 1.8rem);
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 40px;
+  }
+  .riddle-reveal-btn {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    padding: 18px 48px;
+    border-radius: 50px;
+    border: none;
+    background: linear-gradient(135deg, var(--accent5), var(--accent2));
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 8px 32px rgba(139,92,246,0.3);
+  }
+  .riddle-reveal-btn:hover { transform: translateY(-2px); box-shadow: 0 16px 48px rgba(139,92,246,0.4); }
+  .riddle-answer {
+    display: none;
+    margin-top: 32px;
+    padding: 24px 32px;
+    background: rgba(139,92,246,0.1);
+    border: 1.5px solid var(--accent5);
+    border-radius: 14px;
+    animation: slideIn 0.4s ease;
+  }
+  .riddle-answer.visible { display: block; }
+  .riddle-answer-label {
+    font-size: 0.8rem;
+    color: var(--accent5);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+  .riddle-answer-text {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--accent5);
+  }
+
+  /* ─── BUTTONS NAV ─── */
+  .btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    padding: 10px 20px;
+    border-radius: 50px;
+    border: 1.5px solid var(--border);
+    background: transparent;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+  .btn-back:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ─── LOADING SPINNER ─── */
+  .loading-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(10,14,26,0.85);
+    backdrop-filter: blur(8px);
+    z-index: 200;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+  }
+  .loading-overlay.visible { display: flex; }
+  .spinner {
+    width: 64px; height: 64px;
+    border: 4px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-text {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text2);
+    text-align: center;
+  }
+  .loading-dots::after {
+    content: '';
+    animation: dots 1.5s infinite;
+  }
+  @keyframes dots {
+    0% { content: '.'; }
+    33% { content: '..'; }
+    66% { content: '...'; }
+  }
+
+  /* ─── TOAST ─── */
+  .toast {
+    position: fixed;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 28px;
+    font-size: 1rem;
+    font-weight: 700;
+    z-index: 300;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    min-width: 280px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.success { border-color: var(--accent3); color: var(--accent3); }
+  .toast.error { border-color: var(--accent4); color: var(--accent4); }
+  .toast.info { border-color: var(--accent2); color: var(--accent2); }
+
+  /* ─── SUMMARY PAGE ─── */
+  #page-summary {
+    padding: 72px 48px 48px;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .summary-card {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 64px;
+    text-align: center;
+    max-width: 640px;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+  .summary-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent), #f97316, var(--accent2), var(--accent3));
+  }
+  .summary-emoji { font-size: 5rem; margin-bottom: 24px; display: block; }
+  .summary-title {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 2rem;
+    font-weight: 900;
+    margin-bottom: 12px;
+  }
+  .summary-subtitle { color: var(--text2); font-size: 1rem; margin-bottom: 48px; }
+  .summary-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 48px;
+  }
+  .sum-stat {
+    background: var(--surface2);
+    border-radius: 14px;
+    padding: 20px;
+  }
+  .sum-stat-num {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 2rem;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .sum-stat-label { font-size: 0.8rem; color: var(--text3); }
+  .summary-actions { display: flex; gap: 16px; justify-content: center; }
+
+  /* ─── MAVZU SELECT MODAL ─── */
+  .mavzu-input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 600;
+    transition: all 0.2s;
+    margin-bottom: 12px;
+  }
+  .mavzu-input:focus { outline: none; border-color: var(--accent); }
+
+  .mavzu-suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .mavzu-chip {
+    padding: 8px 16px;
+    border-radius: 50px;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--text2);
+  }
+  .mavzu-chip:hover { border-color: var(--accent); color: var(--accent); }
+  .mavzu-chip.selected { background: rgba(245,158,11,0.1); border-color: var(--accent); color: var(--accent); }
+
+  /* Konfetti canvas */
+  #konfetti { 
+    position: fixed; inset: 0; 
+    pointer-events: none; z-index: 250; 
+    display: none;
+  }
+
+  /* Mobile / small screen alert */
+  .screen-alert {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 999;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 48px;
+    gap: 24px;
+  }
+  @media (max-width: 900px) {
+    .screen-alert { display: flex; }
+  }
+  .screen-alert-icon { font-size: 5rem; }
+  .screen-alert h2 {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 900;
+  }
+  .screen-alert p { color: var(--text2); font-size: 1rem; line-height: 1.6; }
+
+  /* Responsive minor tweaks for 1280px boards */
+  @media (max-width: 1280px) {
+    .home-inner { grid-template-columns: 1fr; gap: 40px; }
+    .home-right { display: none; }
+    .fan-cards { grid-template-columns: repeat(3, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- Small screen alert -->
+<div class="screen-alert">
+  <span class="screen-alert-icon">🖥️</span>
+  <h2 id="alert-title">Katta ekran kerak</h2>
+  <p id="alert-desc">Bu dastur elektron doska va kompyuter ekraniga mo'ljallangan. Iltimos, katta ekranda oching.</p>
+</div>
+
+<!-- Lang Bar -->
+<div class="lang-bar">
+  <div style="display:flex; align-items:center; gap:16px; flex:1;">
+    <span style="font-family:'Unbounded',sans-serif; font-size:1rem; font-weight:900; color:var(--accent);">⚡ EduBoard</span>
+  </div>
+  <div class="lang-group">
+    <button class="lang-btn active" onclick="setLang('uz')">O'ZB</button>
+    <button class="lang-btn" onclick="setLang('ru')">РУС</button>
+    <button class="lang-btn" onclick="setLang('en')">ENG</button>
+  </div>
+</div>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <div class="loading-text" id="loadingText">AI savollar tayyorlamoqda<span class="loading-dots"></span></div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Konfetti canvas -->
+<canvas id="konfetti"></canvas>
+
+<!-- ═══════════════════════════════════ PAGE: HOME ═══════════════════════════════════ -->
+<div class="page active" id="page-home">
+  <div class="home-inner">
+    <div class="home-left">
+      <div class="badge">
+        <div class="badge-dot"></div>
+        <span id="badge-text">AI bilan ishlaydi</span>
+      </div>
+      <h1 class="home-title">
+        <span id="home-title-1">Interaktiv</span><br>
+        <span id="home-title-2">Dars Doskasi</span>
+      </h1>
+      <p class="home-desc" id="home-desc">
+        O'qituvchilar uchun AI yordamida darslarni qiziqarli va interaktiv o'tkazish platformasi. Mavzu tanlang — AI savollar tayyorlaydi!
+      </p>
+      <div class="home-stats">
+        <div class="stat-item">
+          <div class="stat-num">9+</div>
+          <div class="stat-label" id="stat1-label">Mashq turlari</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">11</div>
+          <div class="stat-label" id="stat2-label">Sinf bosqichi</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">8+</div>
+          <div class="stat-label" id="stat3-label">Fan sohalari</div>
+        </div>
+      </div>
+      <button class="btn-start" onclick="goPage('page-setup')" id="btn-boshlash">
+        🚀 Darsni Boshlash
+      </button>
+    </div>
+    <div class="home-right">
+      <div class="feature-card">
+        <span class="feature-icon">🤖</span>
+        <div class="feature-title" id="feat1-title">AI Generatsiya</div>
+        <div class="feature-desc" id="feat1-desc">GPT-4 yordamida o'zbek tilida professional savollar</div>
+      </div>
+      <div class="feature-card blue">
+        <span class="feature-icon">🎯</span>
+        <div class="feature-title" id="feat2-title">9 xil Mashq</div>
+        <div class="feature-desc" id="feat2-desc">Quiz, So'z Topish, Boshqotirma va boshqalar</div>
+      </div>
+      <div class="feature-card green">
+        <span class="feature-icon">⏱️</span>
+        <div class="feature-title" id="feat3-title">Timer & Ball</div>
+        <div class="feature-desc" id="feat3-desc">Sozlanadigan taymer va natijalar tizimi</div>
+      </div>
+      <div class="feature-card purple">
+        <span class="feature-icon">🔊</span>
+        <div class="feature-title" id="feat4-title">Ovoz Effektlari</div>
+        <div class="feature-desc" id="feat4-desc">To'g'ri/noto'g'ri uchun ovozli signal</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ PAGE: SETUP ═══════════════════════════════════ -->
+<div class="page" id="page-setup">
+  <div class="setup-container">
+    <div style="display:flex; align-items:center; gap:20px; margin-bottom:48px;">
+      <button class="btn-back" onclick="goPage('page-home')">← <span id="orqaga-text">Bosh sahifa</span></button>
+    </div>
+
+    <div class="page-header">
+      <h2><span id="setup-title">Dars</span> Sozlamalari</h2>
+      <p id="setup-desc">Quyidagi maydonlarni to'ldiring, AI savollar tayyorlaydi</p>
+    </div>
+
+    <!-- Fan Tanlash -->
+    <div class="form-group" style="margin-bottom:24px;">
+      <label class="form-label" id="label-fan">📚 Fan Tanlash</label>
+      <div class="fan-cards" id="fanCards">
+        <div class="fan-card" data-fan="matematika" onclick="selectFan(this)">
+          <span class="fan-card-icon">🔢</span>Matematika
+        </div>
+        <div class="fan-card" data-fan="uzbek" onclick="selectFan(this)">
+          <span class="fan-card-icon">📝</span>O'zbek tili
+        </div>
+        <div class="fan-card" data-fan="ingliz" onclick="selectFan(this)">
+          <span class="fan-card-icon">🌍</span>Ingliz tili
+        </div>
+        <div class="fan-card" data-fan="geografiya" onclick="selectFan(this)">
+          <span class="fan-card-icon">🗺️</span>Geografiya
+        </div>
+        <div class="fan-card" data-fan="tarix" onclick="selectFan(this)">
+          <span class="fan-card-icon">📜</span>Tarix
+        </div>
+        <div class="fan-card" data-fan="fizika" onclick="selectFan(this)">
+          <span class="fan-card-icon">⚡</span>Fizika
+        </div>
+        <div class="fan-card" data-fan="kimyo" onclick="selectFan(this)">
+          <span class="fan-card-icon">🧪</span>Kimyo
+        </div>
+        <div class="fan-card" data-fan="biologiya" onclick="selectFan(this)">
+          <span class="fan-card-icon">🌿</span>Biologiya
+        </div>
+        <div class="fan-card" data-fan="boshqa" onclick="selectFan(this)">
+          <span class="fan-card-icon">📖</span><span id="fan-boshqa">Boshqa</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="setup-grid">
+      <!-- Sinf -->
+      <div class="form-group">
+        <label class="form-label" id="label-sinf">🎓 Sinf Tanlash</label>
+        <div class="sinf-grid">
+          <button class="sinf-btn" data-sinf="1" onclick="selectSinf(this)">1</button>
+          <button class="sinf-btn" data-sinf="2" onclick="selectSinf(this)">2</button>
+          <button class="sinf-btn" data-sinf="3" onclick="selectSinf(this)">3</button>
+          <button class="sinf-btn" data-sinf="4" onclick="selectSinf(this)">4</button>
+          <button class="sinf-btn" data-sinf="5" onclick="selectSinf(this)">5</button>
+          <button class="sinf-btn" data-sinf="6" onclick="selectSinf(this)">6</button>
+          <button class="sinf-btn" data-sinf="7" onclick="selectSinf(this)">7</button>
+          <button class="sinf-btn" data-sinf="8" onclick="selectSinf(this)">8</button>
+          <button class="sinf-btn" data-sinf="9" onclick="selectSinf(this)">9</button>
+          <button class="sinf-btn" data-sinf="10" onclick="selectSinf(this)">10</button>
+          <button class="sinf-btn" data-sinf="11" onclick="selectSinf(this)">11</button>
+        </div>
+      </div>
+
+      <!-- Mavzu -->
+      <div class="form-group">
+        <label class="form-label" id="label-mavzu">📌 Mavzu</label>
+        <input class="mavzu-input" id="mavzuInput" type="text" placeholder="Mavzuni yozing..." oninput="updateMavzu(this.value)">
+        <div class="mavzu-suggestions" id="mavzuSuggestions"></div>
+      </div>
+    </div>
+
+    <!-- Mashq turlari -->
+    <div class="form-group" style="margin-bottom:24px;">
+      <label class="form-label" id="label-mashq">🎮 Mashq Turlarini Tanlang (bir nechta)</label>
+      <div class="mashq-grid" id="mashqGrid">
+        <div class="mashq-card" data-type="quiz" onclick="toggleMashq(this)">
+          <div class="mashq-check"><svg width="14" height="14" fill="none" stroke="black" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>
+          <div class="mashq-info">
+            <div class="mashq-icon">📊</div>
+            <div class="mashq-name">Quiz</div>
+            <div class="mashq-desc">4 variantli test</div>
+          </div>
+        </div>
+        <div class="mashq-card" data-type="truefalse" onclick="toggleMashq(this)">
+          <div class="mashq-check"><svg width="14" height="14" fill="none" stroke="black" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>
+          <div class="mashq-info">
+            <div class="mashq-icon">✅</div>
+            <div class="mashq-name">To'g'ri / Noto'g'ri</div>
+            <div class="mashq-desc">True/False savollari</div>
+          </div>
+        </div>
+        <div class="mashq-card" data-type="fill" onclick="toggleMashq(this)">
+          <div class="mashq-check"><svg width="14" height="14" fill="none" stroke="black" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>
+          <div class="mashq-info">
+            <div class="mashq-icon">✏️</div>
+            <div class="mashq-name">Bo'shliqni To'ldirish</div>
+            <div class="mashq-desc">Javobni yozing</div>
+          </div>
+        </div>
+        <div class="mashq-card" data-type="wordsearch" onclick="toggleMashq(this)">
+          <div class="mashq-check"><svg width="14" height="14" fill="none" stroke="black" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>
+          <div class="mashq-info">
+            <div class="mashq-icon">🔍</div>
+            <div class="mashq-name">So'z Qidirish</div>
+            <div class="mashq-desc">Jadvaldan so'z toping</div>
+          </div>
+        </div>
+        <div class="mashq-card" data-type="riddle" onclick="toggleMashq(this)">
+          <div class="mashq-check"><svg width="14" height="14" fill="none" stroke="black" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>
+          <div class="mashq-info">
+            <div class="mashq-icon">🧩</div>
+            <div class="mashq-name">Boshqotirma</div>
+            <div class="mashq-desc">Topishmoq va riddles</div>
+          </div>
+        </div>
+        <div class="mashq-card" data-type="matching" onclick="toggleMashq(this)">
+          <div class="mashq-check"><svg width="14" height="14" fill="none" stroke="black" stroke-width="3" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div>
+          <div class="mashq-info">
+            <div class="mashq-icon">🔗</div>
+            <div class="mashq-name">Moslashtirish</div>
+            <div class="mashq-desc">Juftlashtiruv</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sonlar -->
+    <div class="setup-grid" style="margin-bottom:32px;">
+      <div class="form-group">
+        <label class="form-label" id="label-nechta">🔢 Savollar Soni</label>
+        <div class="num-input-group">
+          <button class="num-btn" onclick="changeNum(-1)">−</button>
+          <div class="num-display" id="numDisplay">10</div>
+          <button class="num-btn" onclick="changeNum(1)">+</button>
+          <span class="num-label" id="num-label-text">ta savol</span>
+        </div>
+      </div>
+      <!-- AI Key -->
+      <div class="form-group">
+        <label class="form-label" id="label-key">🔑 OpenAI API Key (ixtiyoriy)</label>
+        <input class="mavzu-input" id="apiKeyInput" type="password" placeholder="sk-...">
+        <div style="font-size:0.8rem; color:var(--text3); margin-top:8px;" id="key-hint">Kalit bo'lmasa namunaviy savollar ishlatiladi</div>
+      </div>
+    </div>
+
+    <button class="btn-generate" id="btnGenerate" onclick="generateContent()">
+      <span>⚡</span>
+      <span id="btn-gen-text">Savollar Generatsiya Qilish</span>
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ PAGE: RESULTS ═══════════════════════════════════ -->
+<div class="page" id="page-results">
+  <div class="results-container">
+    <div style="display:flex; align-items:center; gap:20px; margin-bottom:40px;">
+      <button class="btn-back" onclick="goPage('page-setup')">← <span id="orqaga2">Sozlamalar</span></button>
+    </div>
+    <div class="results-header">
+      <div class="results-title" id="results-title">Tayyor bo'ldi!</div>
+      <div class="results-sub" id="results-sub">Qaysi mashqni boshlashni tanlang</div>
+    </div>
+    <div class="results-cards" id="resultsCards"></div>
+    <button class="btn-back" onclick="goPage('page-home')" style="margin-top:8px;">
+      🏠 <span id="home-btn-text">Bosh sahifaga qaytish</span>
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ PAGE: EXERCISE ═══════════════════════════════════ -->
+<div class="page" id="page-exercise">
+  <div class="exercise-layout">
+    <!-- Sidebar -->
+    <div class="exercise-sidebar">
+      <div>
+        <button class="btn-back" style="width:100%; justify-content:center;" onclick="goPage('page-results')">
+          ← <span id="natijalar-text">Natijalar</span>
+        </button>
+      </div>
+
+      <div class="exercise-sidebar-section">
+        <div class="sidebar-title" id="sb-info-label">Ma'lumot</div>
+        <div class="sidebar-info" style="margin-top:12px;">
+          <div class="sidebar-subject" id="sb-subject"></div>
+          <div class="sidebar-topic" id="sb-topic"></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="sidebar-title" style="margin-bottom:12px;" id="sb-progress-label">Jarayon</div>
+        <div class="progress-bar-wrap">
+          <div class="progress-fill" id="progressFill" style="width:0%"></div>
+        </div>
+        <div class="progress-text">
+          <span id="progressCurrent">0</span>/<span id="progressTotal">0</span>
+          <span id="progress-q-label">savol</span>
+        </div>
+      </div>
+
+      <div class="score-section">
+        <div class="score-label" id="sb-score-label">BALL</div>
+        <div class="score-num" id="scoreNum">0</div>
+        <div class="score-total" id="scoreTotalText">/ 0 ta to'g'ri</div>
+      </div>
+
+      <div class="timer-section">
+        <div class="sidebar-title" style="margin-bottom:12px;" id="sb-timer-label">Taymer</div>
+        <div class="timer-display">
+          <span class="timer-icon">⏱️</span>
+          <span class="timer-countdown" id="timerDisplay">60</span>
+        </div>
+        <div class="timer-controls">
+          <button class="timer-btn" onclick="setTimer(30)" id="timer30">30s</button>
+          <button class="timer-btn active" onclick="setTimer(60)" id="timer60">60s</button>
+          <button class="timer-btn" onclick="setTimer(0)" id="timerOff" id="sb-timer-off">Off</button>
+        </div>
+      </div>
+
+      <div>
+        <div class="sidebar-title" style="margin-bottom:12px;" id="sb-questions-label">Savollar</div>
+        <div class="q-list-mini" id="qListMini"></div>
+      </div>
+    </div>
+
+    <!-- Main -->
+    <div class="exercise-main">
+      <div class="exercise-topbar">
+        <div class="ex-type-badge" id="exTypeBadge">📊 Quiz</div>
+        <div class="ex-nav-btns">
+          <button class="nav-btn" onclick="prevQ()" id="prevBtn">← <span id="oldingi-text">Oldingi</span></button>
+          <button class="nav-btn primary" onclick="nextQ()" id="nextBtn"><span id="keyingi-text">Keyingi</span> →</button>
+        </div>
+      </div>
+
+      <div class="exercise-content">
+        <div class="exercise-card" id="exerciseCard">
+          <!-- dynamic content -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ PAGE: SUMMARY ═══════════════════════════════════ -->
+<div class="page" id="page-summary">
+  <div class="summary-card">
+    <span class="summary-emoji" id="summaryEmoji">🏆</span>
+    <div class="summary-title" id="summaryTitle">Ajoyib!</div>
+    <div class="summary-subtitle" id="summarySubtitle">Dars tugadi</div>
+    <div class="summary-stats">
+      <div class="sum-stat">
+        <div class="sum-stat-num" id="sumCorrect" style="color:var(--accent3)">0</div>
+        <div class="sum-stat-label" id="sum-correct-label">To'g'ri</div>
+      </div>
+      <div class="sum-stat">
+        <div class="sum-stat-num" id="sumWrong" style="color:var(--accent4)">0</div>
+        <div class="sum-stat-label" id="sum-wrong-label">Noto'g'ri</div>
+      </div>
+      <div class="sum-stat">
+        <div class="sum-stat-num" id="sumPercent" style="color:var(--accent)">0%</div>
+        <div class="sum-stat-label" id="sum-percent-label">Natija</div>
+      </div>
+    </div>
+    <div class="summary-actions">
+      <button class="btn-back" onclick="goPage('page-results')" style="padding:14px 28px;">
+        🔄 <span id="qayta-text">Qayta urinish</span>
+      </button>
+      <button class="btn-start" onclick="goPage('page-home')" style="padding:14px 28px; font-size:0.95rem;">
+        🏠 <span id="home-text">Bosh sahifa</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════ TRANSLATIONS ═══════════════════════════════════
+const LANGS = {
+  uz: {
+    'badge-text': 'AI bilan ishlaydi',
+    'home-title-1': 'Interaktiv',
+    'home-title-2': 'Dars Doskasi',
+    'home-desc': "O'qituvchilar uchun AI yordamida darslarni qiziqarli va interaktiv o'tkazish platformasi. Mavzu tanlang — AI savollar tayyorlaydi!",
+    'stat1-label': 'Mashq turlari',
+    'stat2-label': 'Sinf bosqichi',
+    'stat3-label': 'Fan sohalari',
+    'btn-boshlash': '🚀 Darsni Boshlash',
+    'feat1-title': 'AI Generatsiya',
+    'feat1-desc': "GPT-4 yordamida o'zbek tilida professional savollar",
+    'feat2-title': '9 xil Mashq',
+    'feat2-desc': 'Quiz, So\'z Topish, Boshqotirma va boshqalar',
+    'feat3-title': 'Timer & Ball',
+    'feat3-desc': 'Sozlanadigan taymer va natijalar tizimi',
+    'feat4-title': 'Ovoz Effektlari',
+    'feat4-desc': "To'g'ri/noto'g'ri uchun ovozli signal",
+    'orqaga-text': 'Bosh sahifa',
+    'setup-title': 'Dars',
+    'setup-desc': "Quyidagi maydonlarni to'ldiring, AI savollar tayyorlaydi",
+    'label-fan': '📚 Fan Tanlash',
+    'label-sinf': '🎓 Sinf Tanlash',
+    'label-mavzu': '📌 Mavzu',
+    'label-mashq': '🎮 Mashq Turlarini Tanlang (bir nechta)',
+    'label-nechta': '🔢 Savollar Soni',
+    'label-key': '🔑 OpenAI API Key (ixtiyoriy)',
+    'key-hint': "Kalit bo'lmasa namunaviy savollar ishlatiladi",
+    'btn-gen-text': 'Savollar Generatsiya Qilish',
+    'fan-boshqa': 'Boshqa',
+    'orqaga2': 'Sozlamalar',
+    'results-title': 'Tayyor bo\'ldi!',
+    'results-sub': 'Qaysi mashqni boshlashni tanlang',
+    'home-btn-text': 'Bosh sahifaga qaytish',
+    'natijalar-text': 'Natijalar',
+    'sb-info-label': "Ma'lumot",
+    'sb-progress-label': 'Jarayon',
+    'sb-score-label': 'BALL',
+    'sb-timer-label': 'Taymer',
+    'sb-questions-label': 'Savollar',
+    'oldingi-text': 'Oldingi',
+    'keyingi-text': 'Keyingi',
+    'progress-q-label': 'savol',
+    'scoreTotalText': '/ {n} ta to\'g\'ri',
+    'qayta-text': 'Qayta urinish',
+    'home-text': 'Bosh sahifa',
+    'sum-correct-label': "To'g'ri",
+    'sum-wrong-label': "Noto'g'ri",
+    'sum-percent-label': 'Natija',
+    'num-label-text': 'ta savol',
+    'loading-text': "AI savollar tayyorlamoqda",
+    'toast-select-fan': 'Fan tanlang!',
+    'toast-select-sinf': 'Sinf tanlang!',
+    'toast-enter-mavzu': 'Mavzu kiriting!',
+    'toast-select-mashq': 'Kamida 1 ta mashq turi tanlang!',
+    'toast-ready': 'Savollar tayyor!',
+    'start-btn': 'Boshlash',
+    'reveal-btn': 'Javobni Ko\'rish',
+    'check-btn': "Tekshirish",
+    'correct-text': "To'g'ri!",
+    'wrong-text': "Noto'g'ri!",
+    'answer-label': 'Javob:',
+    'words-found': 'so\'z topildi',
+    'alert-title': 'Katta ekran kerak',
+    'alert-desc': "Bu dastur elektron doska va kompyuter ekraniga mo'ljallangan. Iltimos, katta ekranda oching.",
+    'mavzu-placeholder': 'Mavzuni yozing...',
+    'timer-off': 'O\'ch',
+    'q-label': 'Savol',
+  },
+  ru: {
+    'badge-text': 'Работает с AI',
+    'home-title-1': 'Интерактивная',
+    'home-title-2': 'Доска',
+    'home-desc': 'Платформа для проведения интерактивных уроков с помощью AI. Выберите тему — AI подготовит вопросы!',
+    'stat1-label': 'Типов упражнений',
+    'stat2-label': 'Классов',
+    'stat3-label': 'Предметов',
+    'btn-boshlash': '🚀 Начать урок',
+    'feat1-title': 'AI Генерация',
+    'feat1-desc': 'Профессиональные вопросы на узбекском с GPT-4',
+    'feat2-title': '9 типов заданий',
+    'feat2-desc': 'Тест, поиск слов, головоломки и другие',
+    'feat3-title': 'Таймер и Очки',
+    'feat3-desc': 'Настраиваемый таймер и система оценок',
+    'feat4-title': 'Звуковые эффекты',
+    'feat4-desc': 'Звуковые сигналы для верных/неверных ответов',
+    'orqaga-text': 'Главная',
+    'setup-title': 'Настройки',
+    'setup-desc': 'Заполните поля, AI подготовит вопросы',
+    'label-fan': '📚 Выбор предмета',
+    'label-sinf': '🎓 Выбор класса',
+    'label-mavzu': '📌 Тема',
+    'label-mashq': '🎮 Типы упражнений (несколько)',
+    'label-nechta': '🔢 Количество вопросов',
+    'label-key': '🔑 OpenAI API Key (необязательно)',
+    'key-hint': 'Без ключа используются примерные вопросы',
+    'btn-gen-text': 'Генерировать вопросы',
+    'fan-boshqa': 'Другое',
+    'orqaga2': 'Настройки',
+    'results-title': 'Готово!',
+    'results-sub': 'Выберите упражнение для начала',
+    'home-btn-text': 'На главную',
+    'natijalar-text': 'Результаты',
+    'sb-info-label': 'Информация',
+    'sb-progress-label': 'Прогресс',
+    'sb-score-label': 'ОЧКИ',
+    'sb-timer-label': 'Таймер',
+    'sb-questions-label': 'Вопросы',
+    'oldingi-text': 'Назад',
+    'keyingi-text': 'Вперёд',
+    'progress-q-label': 'вопрос',
+    'scoreTotalText': '/ {n} правильных',
+    'qayta-text': 'Попробовать снова',
+    'home-text': 'Главная',
+    'sum-correct-label': 'Правильно',
+    'sum-wrong-label': 'Неправильно',
+    'sum-percent-label': 'Результат',
+    'num-label-text': 'вопросов',
+    'loading-text': 'AI готовит вопросы',
+    'toast-select-fan': 'Выберите предмет!',
+    'toast-select-sinf': 'Выберите класс!',
+    'toast-enter-mavzu': 'Введите тему!',
+    'toast-select-mashq': 'Выберите хотя бы 1 тип упражнения!',
+    'toast-ready': 'Вопросы готовы!',
+    'start-btn': 'Начать',
+    'reveal-btn': 'Показать ответ',
+    'check-btn': 'Проверить',
+    'correct-text': 'Правильно!',
+    'wrong-text': 'Неправильно!',
+    'answer-label': 'Ответ:',
+    'words-found': 'слов найдено',
+    'alert-title': 'Нужен большой экран',
+    'alert-desc': 'Это приложение создано для интерактивных досок и компьютеров. Пожалуйста, откройте на большом экране.',
+    'mavzu-placeholder': 'Введите тему...',
+    'timer-off': 'Выкл',
+    'q-label': 'Вопрос',
+  },
+  en: {
+    'badge-text': 'Powered by AI',
+    'home-title-1': 'Interactive',
+    'home-title-2': 'Class Board',
+    'home-desc': 'A platform for teachers to conduct engaging and interactive lessons with AI. Choose a topic — AI generates questions!',
+    'stat1-label': 'Exercise Types',
+    'stat2-label': 'Grade Levels',
+    'stat3-label': 'Subjects',
+    'btn-boshlash': '🚀 Start Lesson',
+    'feat1-title': 'AI Generation',
+    'feat1-desc': 'Professional questions in Uzbek via GPT-4',
+    'feat2-title': '9 Exercise Types',
+    'feat2-desc': 'Quiz, Word Search, Riddles and more',
+    'feat3-title': 'Timer & Score',
+    'feat3-desc': 'Configurable timer and scoring system',
+    'feat4-title': 'Sound Effects',
+    'feat4-desc': 'Audio signals for correct/wrong answers',
+    'orqaga-text': 'Home',
+    'setup-title': 'Lesson',
+    'setup-desc': 'Fill in the fields and AI will prepare questions',
+    'label-fan': '📚 Select Subject',
+    'label-sinf': '🎓 Select Grade',
+    'label-mavzu': '📌 Topic',
+    'label-mashq': '🎮 Exercise Types (multiple)',
+    'label-nechta': '🔢 Number of Questions',
+    'label-key': '🔑 OpenAI API Key (optional)',
+    'key-hint': 'Without key, sample questions will be used',
+    'btn-gen-text': 'Generate Questions',
+    'fan-boshqa': 'Other',
+    'orqaga2': 'Settings',
+    'results-title': 'Ready!',
+    'results-sub': 'Choose which exercise to start',
+    'home-btn-text': 'Back to Home',
+    'natijalar-text': 'Results',
+    'sb-info-label': 'Information',
+    'sb-progress-label': 'Progress',
+    'sb-score-label': 'SCORE',
+    'sb-timer-label': 'Timer',
+    'sb-questions-label': 'Questions',
+    'oldingi-text': 'Previous',
+    'keyingi-text': 'Next',
+    'progress-q-label': 'questions',
+    'scoreTotalText': '/ {n} correct',
+    'qayta-text': 'Try Again',
+    'home-text': 'Home',
+    'sum-correct-label': 'Correct',
+    'sum-wrong-label': 'Wrong',
+    'sum-percent-label': 'Result',
+    'num-label-text': 'questions',
+    'loading-text': 'AI is preparing questions',
+    'toast-select-fan': 'Select a subject!',
+    'toast-select-sinf': 'Select a grade!',
+    'toast-enter-mavzu': 'Enter a topic!',
+    'toast-select-mashq': 'Select at least 1 exercise type!',
+    'toast-ready': 'Questions ready!',
+    'start-btn': 'Start',
+    'reveal-btn': 'Show Answer',
+    'check-btn': 'Check',
+    'correct-text': 'Correct!',
+    'wrong-text': 'Wrong!',
+    'answer-label': 'Answer:',
+    'words-found': 'words found',
+    'alert-title': 'Large screen required',
+    'alert-desc': 'This app is designed for interactive boards and computers. Please open on a large screen.',
+    'mavzu-placeholder': 'Enter topic...',
+    'timer-off': 'Off',
+    'q-label': 'Question',
+  }
+};
+
+let currentLang = 'uz';
+let T = LANGS.uz;
+
+function setLang(lang) {
+  currentLang = lang;
+  T = LANGS[lang];
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`.lang-btn[onclick="setLang('${lang}')"]`).classList.add('active');
+  applyTranslations();
+  document.documentElement.lang = lang;
+}
+
+function applyTranslations() {
+  Object.keys(T).forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = T[id];
+  });
+  // Fan card names
+  const fanNames = {
+    uz: ['Matematika', "O'zbek tili", 'Ingliz tili', 'Geografiya', 'Tarix', 'Fizika', 'Kimyo', 'Biologiya'],
+    ru: ['Математика', 'Узбекский яз.', 'Английский яз.', 'География', 'История', 'Физика', 'Химия', 'Биология'],
+    en: ['Mathematics', 'Uzbek Language', 'English', 'Geography', 'History', 'Physics', 'Chemistry', 'Biology']
+  };
+  const mashqNames = {
+    uz: ['Quiz','To\'g\'ri / Noto\'g\'ri','Bo\'shliqni To\'ldirish','So\'z Qidirish','Boshqotirma','Moslashtirish'],
+    ru: ['Тест','Верно / Неверно','Заполни пропуск','Поиск слов','Головоломка','Сопоставление'],
+    en: ['Quiz','True / False','Fill in the Blank','Word Search','Riddle','Matching']
+  };
+  const mashqDescs = {
+    uz: ['4 variantli test','True/False savollari','Javobni yozing','Jadvaldan so\'z toping','Topishmoq va riddles','Juftlashtiruv'],
+    ru: ['Тест с 4 вариантами','Вопросы Верно/Неверно','Напишите ответ','Найдите слово в таблице','Загадки и головоломки','Сопоставление'],
+    en: ['4-option test','True/False questions','Write the answer','Find word in grid','Riddles & puzzles','Pair matching']
+  };
+  document.querySelectorAll('.fan-card').forEach((c, i) => {
+    if (i < fanNames[currentLang].length) {
+      c.childNodes[1].textContent = fanNames[currentLang][i];
+    }
+  });
+  document.querySelectorAll('.mashq-card').forEach((c, i) => {
+    if (i < mashqNames[currentLang].length) {
+      c.querySelector('.mashq-name').textContent = mashqNames[currentLang][i];
+      c.querySelector('.mashq-desc').textContent = mashqDescs[currentLang][i];
+    }
+  });
+  // placeholder
+  const mi = document.getElementById('mavzuInput');
+  if (mi) mi.placeholder = T['mavzu-placeholder'];
+  // alert
+  document.getElementById('alert-title').textContent = T['alert-title'];
+  document.getElementById('alert-desc').textContent = T['alert-desc'];
+  // timer off btn
+  document.getElementById('timerOff').textContent = T['timer-off'];
+}
+
+// ═══════════════════════════════════ STATE ═══════════════════════════════════
+let state = {
+  selectedFan: null,
+  selectedSinf: null,
+  selectedMavzu: '',
+  selectedMashqlar: [],
+  questionCount: 10,
+  generatedContent: {},
+  currentType: null,
+  currentQuestions: [],
+  currentIndex: 0,
+  score: 0,
+  answered: {},
+  timerSeconds: 60,
+  timerActive: true,
+  timerInterval: null,
+  timerCurrent: 60,
+  wsSelected: [],
+  wsFoundWords: []
+};
+
+// ═══════════════════════════════════ NAVIGATION ═══════════════════════════════════
+function goPage(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(pageId).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// ═══════════════════════════════════ FORM ═══════════════════════════════════
+function selectFan(el) {
+  document.querySelectorAll('.fan-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  state.selectedFan = el.dataset.fan;
+  updateMavzuSuggestions();
+}
+
+function selectSinf(el) {
+  document.querySelectorAll('.sinf-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  state.selectedSinf = el.dataset.sinf;
+  updateMavzuSuggestions();
+}
+
+const MAVZULAR = {
+  matematika: {
+    5: ['Butun sonlar', 'Kasrlar', 'Foizlar', 'Geometrik shakllar'],
+    6: ['Kasrlar', 'Nisbat va proporsiya', 'Tengsizliklar', 'Koordinata'],
+    7: ['Algebraik ifodalar', 'Tenglamalar', "Ko'paytirish formulalari", 'Uchburchaklar'],
+    8: ['Kvadrat tenglamalar', 'Funksiyalar', 'Trigonometriya asoslari', 'Vektorlar'],
+    9: ['Funksiyalar grafiki', 'Arifmetik progressiya', 'Logarifm', 'Trigonometriya'],
+    10: ['Hosilalar', 'Integral', 'Kombinatorika', 'Ehtimollar nazariyasi'],
+    11: ['Limitlar', "Integral qo'llanilishi", 'Statistika', 'Kompleks sonlar']
+  },
+  ingliz: {
+    5: ['Present Simple', 'Colours & Numbers', 'Family members', 'Animals'],
+    6: ['Past Simple', 'Prepositions', 'Countable & Uncountable', 'Daily routines'],
+    7: ['Present Perfect', 'Comparatives', 'Modal verbs', 'Passive voice'],
+    8: ['Conditionals', 'Reported speech', 'Relative clauses', 'Future tenses'],
+    9: ['Subjunctive', 'Advanced modals', 'Phrasal verbs', 'Idioms']
+  },
+  uzbek: {
+    5: ["So'z turkumlari", 'Ot', 'Sifat', 'Fe\'l'],
+    6: ["Gapning bo'laklari", 'Ega va kesim', 'Ikkinchi darajali bo\'laklar', 'Murakkab gap'],
+    7: ["So'z yasalishi", 'Imlo qoidalari', 'Badiiy adabiyot', 'Matn tahlili']
+  },
+  fizika: {
+    7: ["Mexanik harakat", "Kuch va massasi", "Bosim", "Elektr"],
+    8: ["Elektr toki", "Optika", "Issiqlik", "Magnit maydon"],
+    9: ["Mexanika", "Dinamika", "Termodinamika", "Elektrodinamika"],
+    10: ["Kvant fizikasi", "Atom tuzilishi", "Yadro fizikasi", "Optika"]
+  },
+  kimyo: {
+    8: ["Atom tuzilishi", "Kimyoviy bog'", "Oksidlanish-qaytarilish", "Kislotalar"],
+    9: ["Organik kimyo", "Uglevodorodlar", "Spirtlar", "Karboksil kislotalar"],
+    10: ["Polimer kimyo", "Mineral o'g'itlar", "Metallar kimyosi", "Elektroliz"]
+  },
+  biologiya: {
+    6: ["O'simlik hujayra", "Fotosintez", "O'simlik organlari", "Ekologiya"],
+    7: ["Hayvonlar anatomiyasi", "Qon aylanishi", "Hazm qilish", "Asab tizimi"],
+    8: ["Genetika asoslari", "Evolutsiya", "Ekosistema", "Bakteriyalar"]
+  }
+};
+
+function updateMavzuSuggestions() {
+  const container = document.getElementById('mavzuSuggestions');
+  container.innerHTML = '';
+  if (!state.selectedFan || !state.selectedSinf) return;
+  const fanData = MAVZULAR[state.selectedFan];
+  if (!fanData) return;
+  const sinfData = fanData[state.selectedSinf] || fanData[Object.keys(fanData)[0]];
+  if (!sinfData) return;
+  sinfData.forEach(m => {
+    const chip = document.createElement('div');
+    chip.className = 'mavzu-chip';
+    chip.textContent = m;
+    chip.onclick = () => {
+      document.querySelectorAll('.mavzu-chip').forEach(c => c.classList.remove('selected'));
+      chip.classList.add('selected');
+      state.selectedMavzu = m;
+      document.getElementById('mavzuInput').value = m;
+    };
+    container.appendChild(chip);
+  });
+}
+
+function updateMavzu(val) {
+  state.selectedMavzu = val;
+  document.querySelectorAll('.mavzu-chip').forEach(c => c.classList.remove('selected'));
+}
+
+function toggleMashq(el) {
+  el.classList.toggle('selected');
+  const type = el.dataset.type;
+  if (el.classList.contains('selected')) {
+    if (!state.selectedMashqlar.includes(type)) state.selectedMashqlar.push(type);
+  } else {
+    state.selectedMashqlar = state.selectedMashqlar.filter(t => t !== type);
+  }
+}
+
+let questionCount = 10;
+function changeNum(delta) {
+  questionCount = Math.max(3, Math.min(30, questionCount + delta));
+  document.getElementById('numDisplay').textContent = questionCount;
+  state.questionCount = questionCount;
+}
+
+// ═══════════════════════════════════ GENERATE ═══════════════════════════════════
+async function generateContent() {
+  if (!state.selectedFan) { showToast(T['toast-select-fan'], 'error'); return; }
+  if (!state.selectedSinf) { showToast(T['toast-select-sinf'], 'error'); return; }
+  if (!state.selectedMavzu) { showToast(T['toast-enter-mavzu'], 'error'); return; }
+  if (!state.selectedMashqlar.length) { showToast(T['toast-select-mashq'], 'error'); return; }
+
+  showLoading(true);
+
+  // Try AI first
+  const apiKey = document.getElementById('apiKeyInput').value.trim();
+  let content = null;
+
+  if (apiKey && apiKey.startsWith('sk-')) {
+    content = await generateWithAI(apiKey);
+  }
+
+  if (!content) {
+    content = generateSampleContent();
+  }
+
+  state.generatedContent = content;
+  showLoading(false);
+  renderResults();
+  showToast(T['toast-ready'], 'success');
+  goPage('page-results');
+}
+
+async function generateWithAI(apiKey) {
+  try {
+    const prompt = buildPrompt();
+    const res = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: "Siz o'zbek maktab darslari bo'yicha ekspert o'qituvchisiz. Faqat JSON formatida javob bering, boshqa matn yozmang." },
+          { role: 'user', content: prompt }
+        ],
+        temperature: 0.8,
+        max_tokens: 3000
+      })
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    const text = data.choices[0].message.content;
+    const cleaned = text.replace(/```json|```/g, '').trim();
+    return JSON.parse(cleaned);
+  } catch { return null; }
+}
+
+function buildPrompt() {
+  const mashqStr = state.selectedMashqlar.map(m => `${m} (${state.questionCount} ta)`).join(', ');
+  return `Fan: ${state.selectedFan}\nSinf: ${state.selectedSinf}\nMavzu: ${state.selectedMavzu}\nMashq turlari: ${mashqStr}\n\nHar bir mashq uchun o'zbek tilida quyidagi JSON formatida qaytaring:\n{\n  "quiz": [{"savol":"...","variantlar":["a","b","c","d"],"togri_index":0},...],\n  "truefalse": [{"savol":"...","javob":true},...],\n  "fill": [{"savol":"3/4 + 1/4 = ___","javob":"1"},...],\n  "wordsearch": [{"jadval":[["A","B",...],...],"sozlar":["KASR","BUTUN",...]}],\n  "riddle": [{"savol":"...","javob":"..."},...],\n  "matching": [{"juftlar":[{"chap":"...","ong":"..."},...],"sarlavha":"..."}]\n}\n\nFaqat so'ralgan mashq turlarini va ko'rsatilgan sondagi elementlarni qaytaring.`;
+}
+
+function generateSampleContent() {
+  const fan = state.selectedFan || 'matematika';
+  const mavzu = state.selectedMavzu || 'Umumiy';
+  const n = state.questionCount;
+  const content = {};
+
+  if (state.selectedMashqlar.includes('quiz')) {
+    content.quiz = Array.from({length: n}, (_, i) => ({
+      savol: getSampleQuiz(fan, mavzu, i),
+      variantlar: getSampleOptions(fan, mavzu, i),
+      togri_index: 0
+    }));
+  }
+  if (state.selectedMashqlar.includes('truefalse')) {
+    content.truefalse = Array.from({length: n}, (_, i) => ({
+      savol: getSampleTF(fan, mavzu, i),
+      javob: i % 2 === 0
+    }));
+  }
+  if (state.selectedMashqlar.includes('fill')) {
+    content.fill = Array.from({length: n}, (_, i) => ({
+      savol: getSampleFill(fan, mavzu, i),
+      javob: getSampleFillAnswer(fan, mavzu, i)
+    }));
+  }
+  if (state.selectedMashqlar.includes('wordsearch')) {
+    content.wordsearch = [generateWordSearch()];
+  }
+  if (state.selectedMashqlar.includes('riddle')) {
+    content.riddle = SAMPLE_RIDDLES.slice(0, Math.min(n, SAMPLE_RIDDLES.length));
+  }
+  if (state.selectedMashqlar.includes('matching')) {
+    content.matching = [{ sarlavha: mavzu + ' - moslashtirish', juftlar: getSampleMatching(fan).slice(0, 6) }];
+  }
+  return content;
+}
+
+const SAMPLE_RIDDLES = [
+  { savol: "U doim o'zgaradi, lekin doim bir xil qoladi. Bu nima?", javob: "Suv" },
+  { savol: "Har kuni o'ladi, lekin har kech tiriladi. Bu nima?", javob: "Kun (oy va yulduzlar)" },
+  { savol: "Ular ko'p, lekin birdan ko'rasiz. Bu nima?", javob: "Yulduzlar" },
+  { savol: "Og'zi bor, lekin gapirmaydi. Oyog'i bor, lekin yura olmaydi. Bu nima?", javob: "Daryо" },
+  { savol: "Ularsiz o'qiy olmaysiz. Bu nima?", javob: "Harflar" },
+  { savol: "Qancha ko'p olib tashlasangiz, shuncha katta bo'ladi. Bu nima?", javob: "Chuqur" },
+  { savol: "Siz uni sotib olasiz, lekin uni yemaysiz. Kimlar uni yeydi?", javob: "Baliq ovi uchun to'r" },
+  { savol: "Ko'zi yo'q, ammo ko'radi. Qulog'i yo'q, ammo eshitadi. Bu nima?", javob: "Miya" }
+];
+
+function getSampleQuiz(fan, mavzu, i) {
+  const mathQ = [
+    "3/4 + 1/4 = ?", "5 × 6 = ?", "100 - 37 = ?", "2³ = ?", "√144 = ?",
+    "15% of 200 = ?", "4² + 3² = ?", "180 ÷ 12 = ?", "0.5 + 0.75 = ?", "7 × 8 = ?"
+  ];
+  const engQ = [
+    "She ___ a doctor. (to be)", "They ___ football yesterday.", "I have ___ to Paris.", 
+    "___ you speak English?", "He ___ every day.", "We ___ here for 2 hours.", 
+    "The book ___ on the table.", "She ___ reading now.", "Did you ___ the movie?", "It ___ very cold."
+  ];
+  if (fan === 'matematika') return mathQ[i % mathQ.length];
+  if (fan === 'ingliz') return engQ[i % engQ.length];
+  return `${mavzu} bo'yicha ${i + 1}-savol?`;
+}
+
+function getSampleOptions(fan, mavzu, i) {
+  if (fan === 'matematika') {
+    const answers = [["1", "3/4", "1/2", "2/4"], ["30","20","42","36"],["63","73","53","43"],
+      ["8","6","9","4"],["12","11","13","10"],["30","20","40","25"],["25","20","15","30"],
+      ["15","14","16","12"],["1.25","1.5","1.0","2.0"],["54","48","56","63"]];
+    return answers[i % answers.length];
+  }
+  return ["A variant", "B variant", "C variant", "D variant"];
+}
+
+function getSampleTF(fan, mavzu, i) {
+  const q = [
+    `${mavzu} bo'yicha: ${i * 3 + 1} + ${i + 2} = ${(i * 3 + 1) + (i + 2)}`,
+    `${mavzu}: Barcha tomonlari teng bo'lgan to'rtburchak kvadrat deyiladi.`,
+    `${mavzu}: Yer quyosh atrofida aylanadi.`,
+    `${mavzu}: 2 × 2 = 5`,
+    `${mavzu}: O'zbekiston Markaziy Osiyoda joylashgan.`
+  ];
+  return q[i % q.length];
+}
+
+function getSampleFill(fan, mavzu, i) {
+  if (fan === 'matematika') {
+    return [`3 + ___ = 10`, `___ × 4 = 28`, `50 - ___ = 25`, `2³ = ___`, `√64 = ___`][i % 5];
+  }
+  if (fan === 'ingliz') {
+    return [`She ___ a student.`, `They ___ football.`, `I ___ to school every day.`, `He ___ not here.`, `We ___ happy.`][i % 5];
+  }
+  return `${mavzu}: ___`;
+}
+
+function getSampleFillAnswer(fan, mavzu, i) {
+  if (fan === 'matematika') return ['7','7','25','8','8'][i % 5];
+  if (fan === 'ingliz') return ['is','play','go','is','are'][i % 5];
+  return `Javob ${i + 1}`;
+}
+
+function getSampleMatching(fan) {
+  if (fan === 'matematika') return [
+    {chap: '3 + 4', ong: '7'}, {chap: '5 × 6', ong: '30'}, {chap: '√25', ong: '5'},
+    {chap: '2²', ong: '4'}, {chap: '100 ÷ 10', ong: '10'}, {chap: '15 - 8', ong: '7'}
+  ];
+  if (fan === 'ingliz') return [
+    {chap: 'apple', ong: 'olma'}, {chap: 'book', ong: 'kitob'}, {chap: 'school', ong: 'maktab'},
+    {chap: 'water', ong: 'suv'}, {chap: 'sun', ong: 'quyosh'}, {chap: 'house', ong: 'uy'}
+  ];
+  return [
+    {chap: 'A', ong: '1'}, {chap: 'B', ong: '2'}, {chap: 'C', ong: '3'},
+    {chap: 'D', ong: '4'}, {chap: 'E', ong: '5'}, {chap: 'F', ong: '6'}
+  ];
+}
+
+function generateWordSearch() {
+  const words = ['KASR', 'BUTUN', 'SURAT', 'MAXRAJ', 'SON', 'TENGLAMA'];
+  const size = 8;
+  const grid = Array.from({length: size}, () => Array.from({length: size}, () => 
+    String.fromCharCode(65 + Math.floor(Math.random() * 26))
+  ));
+  // Place KASR horizontally
+  ['KASR', 'BUTUN', 'SON'].forEach((word, wi) => {
+    const row = wi * 2 + 1;
+    for (let j = 0; j < word.length && j < size; j++) {
+      grid[row][j] = word[j];
+    }
+  });
+  return { jadval: grid, sozlar: words };
+}
+
+// ═══════════════════════════════════ RESULTS ═══════════════════════════════════
+const TYPE_META = {
+  quiz:       { icon: '📊', color: '#f59e0b', label: { uz: 'Quiz', ru: 'Тест', en: 'Quiz' } },
+  truefalse:  { icon: '✅', color: '#3b82f6', label: { uz: "To'g'ri/Noto'g'ri", ru: 'Верно/Неверно', en: 'True/False' } },
+  fill:       { icon: '✏️', color: '#10b981', label: { uz: "Bo'shliq To'ldirish", ru: 'Заполни пропуск', en: 'Fill the Blank' } },
+  wordsearch: { icon: '🔍', color: '#8b5cf6', label: { uz: "So'z Qidirish", ru: 'Поиск слов', en: 'Word Search' } },
+  riddle:     { icon: '🧩', color: '#ef4444', label: { uz: 'Boshqotirma', ru: 'Головоломка', en: 'Riddle' } },
+  matching:   { icon: '🔗', color: '#06b6d4', label: { uz: 'Moslashtirish', ru: 'Сопоставление', en: 'Matching' } }
+};
+
+function renderResults() {
+  const container = document.getElementById('resultsCards');
+  container.innerHTML = '';
+  Object.keys(state.generatedContent).forEach(type => {
+    const data = state.generatedContent[type];
+    const meta = TYPE_META[type] || { icon: '📋', color: '#f59e0b', label: { uz: type } };
+    const count = Array.isArray(data) ? data.length : 1;
+    const card = document.createElement('div');
+    card.className = 'result-card';
+    card.style.setProperty('--card-accent', meta.color);
+    card.innerHTML = `
+      <span class="result-card-icon">${meta.icon}</span>
+      <div class="result-card-title">${meta.label[currentLang] || meta.label.uz}</div>
+      <div class="result-card-count">${count} ta mashq</div>
+      <button class="btn-start-exercise" style="--card-accent:${meta.color}" onclick="startExercise('${type}')">
+        ▶ ${T['start-btn']}
+      </button>
+    `;
+    container.appendChild(card);
+  });
+}
+
+// ═══════════════════════════════════ EXERCISE ═══════════════════════════════════
+function startExercise(type) {
+  state.currentType = type;
+  state.currentQuestions = state.generatedContent[type] || [];
+  state.currentIndex = 0;
+  state.score = 0;
+  state.answered = {};
+  state.wsSelected = [];
+  state.wsFoundWords = [];
+
+  const meta = TYPE_META[type] || {};
+  document.getElementById('sb-subject').textContent = state.selectedFan?.toUpperCase() || '-';
+  document.getElementById('sb-topic').textContent = state.selectedMavzu || '-';
+  document.getElementById('exTypeBadge').innerHTML = `${meta.icon || '📋'} ${meta.label?.[currentLang] || type}`;
+
+  updateQDots();
+  renderQuestion();
+  startTimer();
+  goPage('page-exercise');
+}
+
+function renderQuestion() {
+  const q = state.currentQuestions[state.currentIndex];
+  const card = document.getElementById('exerciseCard');
+  const n = state.currentQuestions.length;
+
+  // Update progress
+  document.getElementById('progressFill').style.width = `${((state.currentIndex + 1) / n) * 100}%`;
+  document.getElementById('progressCurrent').textContent = state.currentIndex + 1;
+  document.getElementById('progressTotal').textContent = n;
+  document.getElementById('scoreNum').textContent = state.score;
+  document.getElementById('scoreTotalText').textContent = `/ ${n} ${currentLang === 'uz' ? "ta to'g'ri" : currentLang === 'ru' ? 'правильных' : 'correct'}`;
+
+  updateQDots();
+
+  const type = state.currentType;
+  card.innerHTML = '';
+  card.innerHTML = `<div class="q-number">${T['q-label']} ${state.currentIndex + 1} / ${n}</div>`;
+
+  if (type === 'quiz') renderQuiz(card, q);
+  else if (type === 'truefalse') renderTrueFalse(card, q);
+  else if (type === 'fill') renderFill(card, q);
+  else if (type === 'wordsearch') renderWordSearch(card, q);
+  else if (type === 'riddle') renderRiddle(card, q);
+  else if (type === 'matching') renderMatching(card, q);
+
+  // Animation
+  card.style.opacity = '0';
+  card.style.transform = 'translateY(20px)';
+  requestAnimationFrame(() => {
+    card.style.transition = 'all 0.35s ease';
+    card.style.opacity = '1';
+    card.style.transform = 'translateY(0)';
+  });
+}
+
+function renderQuiz(card, q) {
+  const letters = ['A', 'B', 'C', 'D'];
+  const ans = state.answered[state.currentIndex];
+  card.innerHTML += `<div class="q-text">${q.savol}</div>
+    <div class="options-grid">
+      ${q.variantlar.map((v, i) => {
+        let cls = '';
+        if (ans !== undefined) {
+          if (i === q.togri_index) cls = 'correct';
+          else if (i === ans && ans !== q.togri_index) cls = 'wrong';
+        }
+        return `<button class="option-btn ${cls}" onclick="answerQuiz(${i})" ${ans !== undefined ? 'disabled' : ''}>
+          <div class="option-letter">${letters[i]}</div>
+          <div class="option-text">${v}</div>
+        </button>`;
+      }).join('')}
+    </div>
+    ${ans !== undefined ? renderFeedback(ans === q.togri_index, q.variantlar[q.togri_index]) : ''}`;
+}
+
+function renderTrueFalse(card, q) {
+  const ans = state.answered[state.currentIndex];
+  card.innerHTML += `<div class="q-text">${q.savol}</div>
+    <div class="tf-grid">
+      <button class="tf-btn true-btn ${ans !== undefined ? (q.javob === true ? 'correct' : (ans === true && !q.javob ? 'wrong' : '')) : ''}" 
+        onclick="answerTF(true)" ${ans !== undefined ? 'disabled' : ''}>
+        <span class="tf-icon">✅</span>
+        <span class="tf-text">${currentLang === 'en' ? 'True' : currentLang === 'ru' ? 'Верно' : "To'g'ri"}</span>
+      </button>
+      <button class="tf-btn false-btn ${ans !== undefined ? (q.javob === false ? 'correct' : (ans === false && q.javob ? 'wrong' : '')) : ''}" 
+        onclick="answerTF(false)" ${ans !== undefined ? 'disabled' : ''}>
+        <span class="tf-icon">❌</span>
+        <span class="tf-text">${currentLang === 'en' ? 'False' : currentLang === 'ru' ? 'Неверно' : "Noto'g'ri"}</span>
+      </button>
+    </div>
+    ${ans !== undefined ? renderFeedback(ans === q.javob, q.javob ? (currentLang==='en'?'True':currentLang==='ru'?'Верно':"To'g'ri") : (currentLang==='en'?'False':currentLang==='ru'?'Неверно':"Noto'g'ri")) : ''}`;
+}
+
+function renderFill(card, q) {
+  const ans = state.answered[state.currentIndex];
+  card.innerHTML += `<div class="q-text">${q.savol}</div>
+    <input class="fill-blank-input ${ans !== undefined ? (ans === q.javob ? 'correct' : 'wrong') : ''}" 
+      id="fillInput" type="text" placeholder="${currentLang==='en'?'Your answer...':currentLang==='ru'?'Ваш ответ...':'Javobingiz...'}"
+      value="${ans !== undefined ? ans : ''}" ${ans !== undefined ? 'disabled' : ''}>
+    <button class="btn-check" onclick="checkFill()" ${ans !== undefined ? 'disabled' : ''}>
+      ${T['check-btn']}
+    </button>
+    ${ans !== undefined ? renderFeedback(ans === q.javob, q.javob) : ''}`;
+}
+
+function renderWordSearch(card, q) {
+  const found = state.wsFoundWords || [];
+  let html = `<div style="display:flex; gap:48px; flex-wrap:wrap;">
+    <div>
+      <div class="word-search-grid" style="grid-template-columns:repeat(${q.jadval[0].length}, 1fr);">`;
+  q.jadval.forEach((row, ri) => {
+    row.forEach((cell, ci) => {
+      const isSel = state.wsSelected?.some(s => s[0] === ri && s[1] === ci);
+      const isFound = isFoundCell(ri, ci, q);
+      html += `<div class="ws-cell ${isFound ? 'found' : isSel ? 'selected' : ''}" 
+        onclick="toggleWSCell(${ri}, ${ci})">${cell}</div>`;
+    });
+  });
+  html += `</div></div>
+    <div>
+      <div style="font-size:0.9rem; color:var(--text3); margin-bottom:12px; text-transform:uppercase; letter-spacing:1px;">${currentLang==='en'?'Find these words:':currentLang==='ru'?'Найдите слова:':'Quyidagi so\'zlarni toping:'}</div>
+      <div class="words-list">
+        ${q.sozlar.map(w => `<div class="word-chip ${found.includes(w) ? 'found' : ''}">${w}</div>`).join('')}
+      </div>
+      <div style="margin-top:24px; font-size:1rem; color:var(--accent3); font-weight:700;">
+        ${found.length} / ${q.sozlar.length} ${T['words-found']}
+      </div>
+    </div>
+  </div>`;
+  card.innerHTML += html;
+}
+
+function isFoundCell(ri, ci, q) {
+  return (state.wsFoundWords || []).some(w => {
+    // Check if this word starts at (ri, ci) horizontally
+    for (let j = 0; j < w.length && ci + j < q.jadval[ri].length; j++) {
+      if (q.jadval[ri][ci + j] !== w[j]) return false;
+    }
+    return true;
+  });
+}
+
+function toggleWSCell(ri, ci) {
+  if (!state.wsSelected) state.wsSelected = [];
+  const idx = state.wsSelected.findIndex(s => s[0] === ri && s[1] === ci);
+  if (idx >= 0) state.wsSelected.splice(idx, 1);
+  else state.wsSelected.push([ri, ci]);
+  renderQuestion();
+}
+
+function renderRiddle(card, q) {
+  card.innerHTML += `
+    <div class="riddle-card">
+      <span class="riddle-deco">🧩</span>
+      <div class="riddle-text">${q.savol}</div>
+      <button class="riddle-reveal-btn" onclick="revealRiddle()" id="revealBtn">
+        ${T['reveal-btn']}
+      </button>
+      <div class="riddle-answer" id="riddleAnswer">
+        <div class="riddle-answer-label">${T['answer-label']}</div>
+        <div class="riddle-answer-text">${q.javob}</div>
+      </div>
+    </div>`;
+}
+
+function renderMatching(card, q) {
+  const shuffledRight = [...q.juftlar].sort(() => Math.random() - 0.5);
+  const ans = state.answered[state.currentIndex];
+  card.innerHTML += `
+    <div class="q-text">${q.sarlavha}</div>
+    <div style="display:grid; grid-template-columns:1fr auto 1fr; gap:20px; align-items:center; max-width:700px;">
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        ${q.juftlar.map((j, i) => `
+          <div style="background:var(--surface); border:1.5px solid var(--border); border-radius:12px; padding:16px 20px; font-weight:700; font-size:1.05rem;">${j.chap}</div>
+        `).join('')}
+      </div>
+      <div style="display:flex; flex-direction:column; gap:12px; align-items:center;">
+        ${q.juftlar.map(() => '<div style="color:var(--accent); font-size:1.5rem; font-weight:900; line-height:56px;">→</div>').join('')}
+      </div>
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        ${shuffledRight.map((j, i) => `
+          <div style="background:var(--surface2); border:1.5px solid var(--accent); border-radius:12px; padding:16px 20px; font-weight:700; font-size:1.05rem; color:var(--accent); cursor:pointer;" onclick="this.style.background='rgba(245,158,11,0.2)'">${j.ong}</div>
+        `).join('')}
+      </div>
+    </div>
+    <div style="margin-top:24px;">
+      <button class="btn-check" onclick="revealMatching(${JSON.stringify(q.juftlar).replace(/"/g,"'")})">
+        ${T['reveal-btn']}
+      </button>
+    </div>
+    <div id="matchingAnswer" style="display:none; margin-top:20px; padding:20px; background:rgba(16,185,129,0.1); border:1.5px solid var(--accent3); border-radius:14px;">
+      ${q.juftlar.map(j => `<div style="display:flex; gap:16px; margin-bottom:8px; font-weight:700;">
+        <span>${j.chap}</span><span style="color:var(--accent3)">→</span><span style="color:var(--accent3)">${j.ong}</span>
+      </div>`).join('')}
+    </div>`;
+}
+
+function revealMatching() {
+  document.getElementById('matchingAnswer').style.display = 'block';
+}
+
+function revealRiddle() {
+  const ans = document.getElementById('riddleAnswer');
+  const btn = document.getElementById('revealBtn');
+  if (ans) ans.classList.add('visible');
+  if (btn) btn.style.display = 'none';
+  if (state.answered[state.currentIndex] === undefined) {
+    state.answered[state.currentIndex] = true;
+    state.score++;
+    playSound(true);
+    updateQDots();
+  }
+}
+
+function renderFeedback(isCorrect, correctAnswer) {
+  return `<div class="feedback-banner ${isCorrect ? 'correct' : 'wrong'}">
+    <span class="feedback-icon">${isCorrect ? '🎉' : '😔'}</span>
+    <div>
+      <div class="feedback-text">${isCorrect ? T['correct-text'] : T['wrong-text']}</div>
+      ${!isCorrect ? `<div class="feedback-answer">${T['answer-label']} ${correctAnswer}</div>` : ''}
+    </div>
+  </div>`;
+}
+
+function answerQuiz(idx) {
+  if (state.answered[state.currentIndex] !== undefined) return;
+  const q = state.currentQuestions[state.currentIndex];
+  state.answered[state.currentIndex] = idx;
+  const correct = idx === q.togri_index;
+  if (correct) state.score++;
+  playSound(correct);
+  updateQDots();
+  renderQuestion();
+}
+
+function answerTF(val) {
+  if (state.answered[state.currentIndex] !== undefined) return;
+  const q = state.currentQuestions[state.currentIndex];
+  state.answered[state.currentIndex] = val;
+  const correct = val === q.javob;
+  if (correct) state.score++;
+  playSound(correct);
+  updateQDots();
+  renderQuestion();
+}
+
+function checkFill() {
+  const input = document.getElementById('fillInput');
+  if (!input) return;
+  const val = input.value.trim().toLowerCase();
+  const q = state.currentQuestions[state.currentIndex];
+  const correct = val === q.javob.toLowerCase();
+  state.answered[state.currentIndex] = val;
+  if (correct) state.score++;
+  playSound(correct);
+  updateQDots();
+  renderQuestion();
+}
+
+function updateQDots() {
+  const container = document.getElementById('qListMini');
+  container.innerHTML = '';
+  state.currentQuestions.forEach((_, i) => {
+    const dot = document.createElement('div');
+    dot.className = 'q-dot';
+    dot.textContent = i + 1;
+    if (i === state.currentIndex) dot.classList.add('current');
+    else if (state.answered[i] !== undefined) {
+      const q = state.currentQuestions[i];
+      const isCorrect = checkAnswerCorrect(i);
+      dot.classList.add(isCorrect ? 'correct' : 'wrong');
+    }
+    dot.onclick = () => jumpToQ(i);
+    container.appendChild(dot);
+  });
+}
+
+function checkAnswerCorrect(i) {
+  const q = state.currentQuestions[i];
+  const ans = state.answered[i];
+  if (state.currentType === 'quiz') return ans === q.togri_index;
+  if (state.currentType === 'truefalse') return ans === q.javob;
+  if (state.currentType === 'fill') return ans?.toLowerCase() === q.javob?.toLowerCase();
+  if (state.currentType === 'riddle') return ans === true;
+  return ans !== undefined;
+}
+
+function jumpToQ(i) {
+  state.currentIndex = i;
+  renderQuestion();
+  resetTimer();
+}
+
+function nextQ() {
+  if (state.currentIndex < state.currentQuestions.length - 1) {
+    state.currentIndex++;
+    renderQuestion();
+    resetTimer();
+  } else {
+    showSummary();
+  }
+}
+
+function prevQ() {
+  if (state.currentIndex > 0) {
+    state.currentIndex--;
+    renderQuestion();
+    resetTimer();
+  }
+}
+
+function showSummary() {
+  clearInterval(state.timerInterval);
+  const total = state.currentQuestions.length;
+  const correct = state.score;
+  const wrong = total - correct;
+  const pct = Math.round((correct / total) * 100);
+
+  document.getElementById('sumCorrect').textContent = correct;
+  document.getElementById('sumWrong').textContent = wrong;
+  document.getElementById('sumPercent').textContent = pct + '%';
+
+  let emoji = '😊'; let title = '';
+  if (pct >= 90) { emoji = '🏆'; title = currentLang==='uz'?'Ajoyib!':currentLang==='ru'?'Отлично!':'Excellent!'; }
+  else if (pct >= 70) { emoji = '👏'; title = currentLang==='uz'?'Yaxshi!':currentLang==='ru'?'Хорошо!':'Good job!'; }
+  else if (pct >= 50) { emoji = '👍'; title = currentLang==='uz'?'Qoniqarli':currentLang==='ru'?'Неплохо':'Not bad'; }
+  else { emoji = '💪'; title = currentLang==='uz'?"Ko'proq mashq qiling":currentLang==='ru'?'Нужно больше практики':'Need more practice'; }
+
+  document.getElementById('summaryEmoji').textContent = emoji;
+  document.getElementById('summaryTitle').textContent = title;
+  document.getElementById('summarySubtitle').textContent = `${state.selectedMavzu} — ${state.selectedFan?.toUpperCase()}`;
+
+  if (pct >= 70) spawnKonfetti();
+  goPage('page-summary');
+}
+
+// ═══════════════════════════════════ TIMER ═══════════════════════════════════
+function setTimer(s) {
+  document.querySelectorAll('.timer-btn').forEach(b => b.classList.remove('active'));
+  if (s === 30) document.getElementById('timer30').classList.add('active');
+  else if (s === 60) document.getElementById('timer60').classList.add('active');
+  else document.getElementById('timerOff').classList.add('active');
+  state.timerSeconds = s;
+  state.timerActive = s > 0;
+  resetTimer();
+}
+
+function startTimer() {
+  clearInterval(state.timerInterval);
+  if (!state.timerActive || state.timerSeconds === 0) {
+    document.getElementById('timerDisplay').textContent = '∞';
+    return;
+  }
+  state.timerCurrent = state.timerSeconds;
+  document.getElementById('timerDisplay').textContent = state.timerCurrent;
+  state.timerInterval = setInterval(() => {
+    state.timerCurrent--;
+    const el = document.getElementById('timerDisplay');
+    if (el) el.textContent = state.timerCurrent;
+    if (el) el.className = 'timer-countdown' + (state.timerCurrent <= 10 ? ' warning' : '');
+    if (state.timerCurrent <= 0) {
+      clearInterval(state.timerInterval);
+      playTimeUp();
+      // Auto-next
+      setTimeout(() => {
+        if (state.currentIndex < state.currentQuestions.length - 1) {
+          state.currentIndex++;
+          renderQuestion();
+          startTimer();
+        } else { showSummary(); }
+      }, 1000);
+    }
+  }, 1000);
+}
+
+function resetTimer() { clearInterval(state.timerInterval); startTimer(); }
+
+// ═══════════════════════════════════ AUDIO ═══════════════════════════════════
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let audioCtx;
+
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new AudioCtx();
+  return audioCtx;
+}
+
+function playSound(correct) {
+  try {
+    const ctx = getAudioCtx();
+    if (correct) {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(523, ctx.currentTime);
+      osc.frequency.setValueAtTime(659, ctx.currentTime + 0.1);
+      osc.frequency.setValueAtTime(784, ctx.currentTime + 0.2);
+      gain.gain.setValueAtTime(0.3, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+      osc.start(); osc.stop(ctx.currentTime + 0.5);
+    } else {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(200, ctx.currentTime);
+      osc.frequency.setValueAtTime(150, ctx.currentTime + 0.1);
+      gain.gain.setValueAtTime(0.2, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+      osc.start(); osc.stop(ctx.currentTime + 0.4);
+    }
+  } catch(e) {}
+}
+
+function playTimeUp() {
+  try {
+    const ctx = getAudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(880, ctx.currentTime);
+    gain.gain.setValueAtTime(0.15, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+    osc.start(); osc.stop(ctx.currentTime + 0.3);
+  } catch(e) {}
+}
+
+// ═══════════════════════════════════ TOAST ═══════════════════════════════════
+let toastTimeout;
+function showToast(msg, type = 'info') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = `toast ${type} show`;
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => el.classList.remove('show'), 2800);
+}
+
+// ═══════════════════════════════════ LOADING ═══════════════════════════════════
+function showLoading(show) {
+  const el = document.getElementById('loadingOverlay');
+  if (show) el.classList.add('visible');
+  else el.classList.remove('visible');
+  document.getElementById('loadingText').innerHTML = T['loading-text'] + '<span class="loading-dots"></span>';
+}
+
+// ═══════════════════════════════════ KONFETTI ═══════════════════════════════════
+function spawnKonfetti() {
+  const canvas = document.getElementById('konfetti');
+  canvas.style.display = 'block';
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const particles = Array.from({length: 120}, () => ({
+    x: Math.random() * canvas.width,
+    y: -20,
+    size: Math.random() * 10 + 5,
+    color: ['#f59e0b','#3b82f6','#10b981','#ef4444','#8b5cf6'][Math.floor(Math.random() * 5)],
+    vx: (Math.random() - 0.5) * 4,
+    vy: Math.random() * 3 + 2,
+    rotation: Math.random() * 360,
+    rotSpeed: (Math.random() - 0.5) * 5
+  }));
+  let frame = 0;
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => {
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rotation * Math.PI / 180);
+      ctx.fillStyle = p.color;
+      ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
+      ctx.restore();
+      p.x += p.vx; p.y += p.vy;
+      p.rotation += p.rotSpeed;
+      p.vy += 0.05;
+    });
+    frame++;
+    if (frame < 180) requestAnimationFrame(draw);
+    else { ctx.clearRect(0, 0, canvas.width, canvas.height); canvas.style.display = 'none'; }
+  }
+  draw();
+}
+
+// ═══════════════════════════════════ INIT ═══════════════════════════════════
+applyTranslations();
+</script>
+</body>
+</html>
